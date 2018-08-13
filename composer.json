@@ -1,0 +1,11 @@
+{
+    "name": "drupal-pattern-lab/attach-library-twig-extension",
+    "description": "Twig function that lets Pattern Lab use a simple version of Drupal's attach_library function to add javascript files per component.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Evan Willhite",
+            "email": "evan@fourkitchens.com"
+        }
+    ]
+}
