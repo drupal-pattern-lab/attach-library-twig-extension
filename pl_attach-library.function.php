@@ -21,8 +21,14 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
     if ($key === $libraryName) {
       $files = $yamlOutput[$key]['js'];
       // For each file, create an async script to insert to the Twig component.
-      foreach($files as $key => $jsPath) {
-        $scriptString = '<script async src="/' . $key . '"></script>';
+      foreach($files as $key => $file) {
+        // By default prefix paths with a /, but remove this for external JS
+        // as it would break URLs.
+        $path_prefix = '/';
+        if (isset($file['type']) && $file['type'] === 'external') {
+          $path_prefix = '';
+        }
+        $scriptString = '<script src="' . $path_prefix . $key . '"></script>';
         $stringLoader = \PatternLab\Template::getStringLoader();
         $output = $stringLoader->render(array("string" => $scriptString, "data" => []));
         return $output;
