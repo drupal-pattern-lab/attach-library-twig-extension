@@ -13,6 +13,7 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
   // Find Library in libraries.yml file.
   $yamlFile = glob('*.libraries.yml');
   $yamlOutput = Yaml::parseFile($yamlFile[0]);
+  $scriptTags = [];
 
   // For each item in .libraries.yml file.
   foreach($yamlOutput as $key => $value) {
@@ -24,9 +25,10 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
       foreach($files as $key => $jsPath) {
         $scriptString = '<script async src="/' . $key . '"></script>';
         $stringLoader = \PatternLab\Template::getStringLoader();
-        $output = $stringLoader->render(array("string" => $scriptString, "data" => []));
-        return $output;
+        $scriptTags[$key] = $stringLoader->render(array("string" => $scriptString, "data" => []));
     	}
     }
   }
+
+  return implode($scriptTags);
 }, array('is_safe' => array('html')));
