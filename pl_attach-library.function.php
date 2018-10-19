@@ -28,7 +28,7 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
         if (isset($file['type']) && $file['type'] === 'external') {
           $path_prefix = '';
         }
-        $scriptString = '<script src="' . $path_prefix . $key . '"></script>';
+        $scriptString = '<script data-name="reload" src="' . $path_prefix . $key . '"></script>';
         $stringLoader = \PatternLab\Template::getStringLoader();
         $output = $stringLoader->render(array("string" => $scriptString, "data" => []));
         return $output;
