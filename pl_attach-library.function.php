@@ -22,7 +22,7 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
       $files = $yamlOutput[$key]['js'];
       // For each file, create an async script to insert to the Twig component.
       foreach($files as $key => $jsPath) {
-        $scriptString = '<script data-name="reload" src="/' . $key . '"></script>';
+        $scriptString = '<script data-name="reload" data-src="/' . $key . '"></script>';
         $stringLoader = \PatternLab\Template::getStringLoader();
         $output = $stringLoader->render(array("string" => $scriptString, "data" => []));
         return $output;
