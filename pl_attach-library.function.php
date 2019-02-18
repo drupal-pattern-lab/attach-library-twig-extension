@@ -16,27 +16,53 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
   $yamlFile = glob('*.libraries.yml');
   $yamlOutput = Yaml::parseFile($yamlFile[0]);
   $scriptTags = [];
+  $styleTags = [];
 
   // For each item in .libraries.yml file.
   foreach ($yamlOutput as $key => $value) {
 
     // If the library exists.
     if ($key === $libraryName) {
-      $files = $yamlOutput[$key]['js'];
-      // For each file, create an async script to insert to the Twig component.
-      foreach ($files as $key => $file) {
-        // By default prefix paths with a /, but remove this for external JS
-        // as it would break URLs.
-        $path_prefix = '/';
-        if (isset($file['type']) && $file['type'] === 'external') {
-          $path_prefix = '';
+      if (isset($yamlOutput[$key]['js'])) {
+        $js_files = $yamlOutput[$key]['js'];
+      }
+      // Check if CSS files are defined.
+      if (isset($yamlOutput[$key]['css'])) {
+        // Create a single array from stylesheets groups (base, theme).
+        $css_files = array_reduce($yamlOutput[$key]['css'], 'array_merge', []);
+      }
+
+      // For each JS file, create an async script to insert to the Twig component.
+      if (isset($js_files)) {
+        foreach ($js_files as $key => $file) {
+          // By default prefix paths with relative path to dist folder,
+          // but remove this for external JS as it would break URLs.
+          $path_prefix = '/';
+          if (isset($file['type']) && $file['type'] === 'external') {
+            $path_prefix = '';
+          }
+          $scriptString = '<script data-name="reload" data-src="' . $path_prefix . $key . '"></script>';
+          $stringLoader = Template::getStringLoader();
+          $scriptTags[$key] = $stringLoader->render(["string" => $scriptString, "data" => []]);
         }
-        $scriptString = '<script data-name="reload" data-src="' . $path_prefix . $key . '"></script>';
-        $stringLoader = Template::getStringLoader();
-        $scriptTags[$key] = $stringLoader->render(["string" => $scriptString, "data" => []]);
+      }
+
+      // For each CSS file, create a stylesheet link to insert to the Twig component.
+      if (isset($css_files)) {
+        foreach ($css_files as $key => $file) {
+          // By default prefix paths with relative path to dist folder,
+          // but remove this for external CSS as it would break URLs.
+          $path_prefix = '/';
+          if (isset($file['type']) && $file['type'] === 'external') {
+            $path_prefix = '';
+          }
+          $linkString = '<link rel="stylesheet" href="' . $path_prefix . $key . '">';
+          $stringLoader = Template::getStringLoader();
+          $styleTags[$key] = $stringLoader->render(["string" => $linkString, "data" => []]);
+        }
       }
     }
   }
-
-  return implode($scriptTags);
+  echo implode($styleTags);
+  echo implode($scriptTags);
 }, ['is_safe' => ['html']]);
