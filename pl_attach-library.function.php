@@ -25,7 +25,7 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
       foreach($files as $key => $file) {
         // By default prefix paths with a /, but remove this for external JS
         // as it would break URLs.
-        $path_prefix = '/';
+        $path_prefix = '../../../../';
         if (isset($file['type']) && $file['type'] === 'external') {
           $path_prefix = '';
         }
