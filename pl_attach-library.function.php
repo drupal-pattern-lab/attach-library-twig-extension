@@ -8,17 +8,17 @@ use Symfony\Component\Yaml\Yaml;
 
 $function = new Twig_SimpleFunction('attach_library', function ($string) {
   // Get Library Name from string.
-  $libraryName = substr($string, strpos($string, "/") + 1);
+  $library_name = substr($string, strpos($string, "/") + 1);
 
   // Find Library in libraries.yml file.
-  $yamlFile = glob('*.libraries.yml');
-  $yamlOutput = Yaml::parseFile($yamlFile[0]);
-  $libraryTags = [];
+  $yaml_file = glob('*.libraries.yml');
+  $yaml_output = Yaml::parseFile($yaml_file[0]);
+  $library_tags = [];
 
-  // Add appropriate HTML tag to $libraryTags array.
-  $add_library_tag = function ($library_tag) use (&$libraryTags) {
-    $stringLoader = \PatternLab\Template::getStringLoader();
-    $libraryTags[] = $stringLoader->render(["string" => $library_tag, "data" => []]);
+  // Add appropriate HTML tag to $library_tags array.
+  $add_library_tag = function ($library_tag) use (&$library_tags) {
+    $string_loader = \PatternLab\Template::getStringLoader();
+    $library_tags[] = $string_loader->render(["string" => $library_tag, "data" => []]);
   };
 
   // By default prefix paths with a /, but remove this for external JS
@@ -28,11 +28,11 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
   };
 
   // For each item in .libraries.yml file.
-  foreach($yamlOutput as $file => $value) {
+  foreach($yaml_output as $file => $value) {
 
     // If the library exists.
-    if ($file === $libraryName) {
-      $js_files = $yamlOutput[$file]['js'];
+    if ($file === $library_name) {
+      $js_files = $yaml_output[$file]['js'];
 
       if (!empty($js_files)) {
         // For each file, create an async script to insert to the Twig component.
@@ -41,7 +41,7 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
         }
       }
 
-      $css_groups = $yamlOutput[$file]['css'];
+      $css_groups = $yaml_output[$file]['css'];
 
       if (!empty($css_groups)) {
         // For each file, create an async script to insert to the Twig component.
@@ -54,5 +54,5 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
     }
   }
 
-  return implode($libraryTags);
+  return implode($library_tags);
 }, array('is_safe' => array('html')));
