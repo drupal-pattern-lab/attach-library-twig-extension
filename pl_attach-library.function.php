@@ -7,6 +7,12 @@
 use Symfony\Component\Yaml\Yaml;
 
 $function = new Twig_SimpleFunction('attach_library', function ($string) {
+  $path_to_theme = \PatternLab\Config::getOption('themePath');
+
+  if (empty($path_to_theme)) {
+    throw new Exception('Missing themePath config option within PatternLab\'s config.yml. Please see the attach-library-twig-extension README.md.');
+  }
+
   // Get Library Name from string.
   $library_name = substr($string, strpos($string, "/") + 1);
 
@@ -23,8 +29,8 @@ $function = new Twig_SimpleFunction('attach_library', function ($string) {
 
   // By default prefix paths with a /, but remove this for external JS
   // as it would break URLs.
-  $build_path = function($options, $file) {
-    return (isset($options['type']) && $options['type'] === 'external') ? $file : "/$file";
+  $build_path = function($options, $file) use (&$path_to_theme) {
+    return (isset($options['type']) && $options['type'] === 'external') ? $file : "$path_to_theme/$file";
   };
 
   // For each item in .libraries.yml file.
